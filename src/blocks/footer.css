@@ -1,0 +1,21 @@
+.footer {
+  margin: 0 auto;
+  width: auto;
+  color: #545454;
+}
+
+.footer__copyright {
+  margin: 67px 0 60px;
+  font-weight: 400;
+  text-align: center;
+  font-size: clamp(0.875rem, 0.7917rem + 0.4167vw, 1.125rem);
+  line-height: 100%;
+  letter-spacing: 0%;
+}
+
+@media screen and (max-width: 880px) {
+  .footer {
+    padding: 0 19px;
+    box-sizing: border-box;
+  }
+}
