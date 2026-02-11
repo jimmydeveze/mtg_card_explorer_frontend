@@ -1,6 +1,7 @@
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "../Header/Header.jsx";
-// import Main from "../Main/Main.jsx";
+import Home from "../Home/Home.jsx";
+// import Explorer from "../Explorer/Explorer.jsx";
 import Footer from "../Footer/Footer.jsx";
 
 function App() {
@@ -8,7 +9,14 @@ function App() {
     <BrowserRouter>
       <div className="page">
         <Header />
-        {/* <Main /> */}
+
+        <main className="page__content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            {/* <Route path="/explorer" element={<Explorer />} /> */}
+          </Routes>
+        </main>
+
         <Footer />
       </div>
     </BrowserRouter>

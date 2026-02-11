@@ -5,7 +5,7 @@
 }
 
 .footer__copyright {
-  margin: 67px 0 60px;
+  margin: 30px 0;
   font-weight: 400;
   text-align: center;
   font-size: clamp(0.875rem, 0.7917rem + 0.4167vw, 1.125rem);
