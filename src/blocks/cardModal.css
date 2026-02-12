@@ -1,0 +1,95 @@
+.modal {
+  width: 900px;
+  max-width: 95%;
+  border: none;
+  border-radius: 18px;
+  padding: 0;
+  background: #111;
+  color: white;
+  overflow: hidden;
+  animation: modalFade 0.25s ease-out;
+}
+
+.modal::backdrop {
+  background: rgba(0, 0, 0, 0.85);
+  animation: backdropFade 0.25s ease-out;
+}
+
+@keyframes modalFade {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes backdropFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal__content {
+  display: flex;
+  gap: 30px;
+  padding: 30px;
+}
+
+.modal__image-container {
+  flex: 1;
+}
+
+.modal__image {
+  width: 100%;
+  border-radius: 12px;
+}
+
+.modal__info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal__title {
+  font-size: 1.8rem;
+}
+
+.modal__mana {
+  color: #4da3ff;
+  font-weight: 600;
+}
+
+.modal__type {
+  font-style: italic;
+  color: #bbb;
+}
+
+.modal__text {
+  line-height: 1.5;
+  color: #ddd;
+}
+
+.modal__stats {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+}
+
+.modal__close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}

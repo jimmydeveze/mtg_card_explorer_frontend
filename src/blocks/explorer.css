@@ -1,0 +1,29 @@
+.explorer {
+  padding: 60px 0;
+}
+
+.explorer__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.explorer__title {
+  font-size: 2rem;
+}
+
+.explorer__search {
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: none;
+  background: #1a1a1a;
+  color: white;
+  width: 250px;
+}
+
+.explorer__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 24px;
+}

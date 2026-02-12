@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "../Header/Header.jsx";
 import Home from "../Home/Home.jsx";
-// import Explorer from "../Explorer/Explorer.jsx";
+import Explorer from "../Explorer/Explorer.jsx";
 import Footer from "../Footer/Footer.jsx";
 
 function App() {
@@ -13,7 +13,7 @@ function App() {
         <main className="page__content">
           <Routes>
             <Route path="/" element={<Home />} />
-            {/* <Route path="/explorer" element={<Explorer />} /> */}
+            <Route path="/cards" element={<Explorer />} />
           </Routes>
         </main>
 
