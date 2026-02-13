@@ -13,7 +13,7 @@ function Home() {
             buscar.
           </p>
 
-          <Link to="/explorer" className="home__button">
+          <Link to="/cards" className="home__button">
             Comenzar exploración
           </Link>
 

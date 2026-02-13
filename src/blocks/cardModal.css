@@ -93,3 +93,47 @@
   font-size: 20px;
   cursor: pointer;
 }
+
+.modal.closing {
+  animation: modalClose 0.2s ease forwards;
+}
+
+@keyframes modalClose {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+.modal__mana {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.mana-icon {
+  width: 26px;
+  height: 26px;
+}
+
+@media (max-width: 768px) {
+  .modal {
+    width: 95%;
+  }
+
+  .modal__content {
+    flex-direction: column;
+  }
+
+  .modal__image-container {
+    width: 100%;
+  }
+
+  .modal__info {
+    width: 100%;
+  }
+}
