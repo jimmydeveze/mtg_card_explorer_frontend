@@ -6,4 +6,6 @@
 @import url(./blocks/explorer.css);
 @import url(./blocks/cardItem.css);
 @import url(./blocks//cardModal.css);
+@import url(./blocks/preloader.css);
+@import url(./blocks/emptyState.css);
 @import url(./blocks/footer.css);

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import CardModal from "./CardModal/CardModal";
 import CardItem from "./CardItem/CardItem";
+import Preloader from "../Preloader/Preloader";
+import EmptyState from "../EmptyState/EmptyState";
 
 function Explorer() {
   const mockCards = Array.from({ length: 12 }, (_, i) => ({
@@ -18,6 +20,7 @@ function Explorer() {
   }));
 
   const [selectedCard, setSelectedCard] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   return (
     <section className="explorer">
@@ -32,9 +35,15 @@ function Explorer() {
       </div>
 
       <div className="explorer__grid">
-        {mockCards.map((card) => (
-          <CardItem key={card.id} card={card} onClick={setSelectedCard} />
-        ))}
+        {loading ? (
+          <Preloader />
+        ) : mockCards.length === 0 ? (
+          <EmptyState />
+        ) : (
+          mockCards.map((card) => (
+            <CardItem key={card.id} card={card} onClick={setSelectedCard} />
+          ))
+        )}
       </div>
 
       <CardModal card={selectedCard} onClose={() => setSelectedCard(null)} />
