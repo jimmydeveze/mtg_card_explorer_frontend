@@ -4,6 +4,8 @@
 
 .explorer__header {
   display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 40px;
@@ -13,17 +15,78 @@
   font-size: 2rem;
 }
 
+.explorer__search-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
 .explorer__search {
-  padding: 10px 16px;
-  border-radius: 6px;
-  border: none;
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #333;
   background: #1a1a1a;
   color: white;
-  width: 250px;
+  min-width: 200px;
 }
 
 .explorer__grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 24px;
+}
+
+.explorer__submit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  background-color: #e50914;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(229, 9, 20, 0.35);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.25s ease,
+    transform 0.15s ease;
+}
+
+.explorer__submit:hover {
+  background-color: #f6121d;
+  box-shadow: 0 10px 26px rgba(229, 9, 20, 0.45);
+}
+
+.explorer__submit:active {
+  transform: translateY(1px);
+}
+
+.explorer__submit img {
+  width: 18px;
+  height: 18px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+@media (max-width: 600px) {
+  .explorer__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .explorer__submit-text {
+    display: none;
+  }
+
+  .explorer__submit {
+    width: 100%;
+  }
 }

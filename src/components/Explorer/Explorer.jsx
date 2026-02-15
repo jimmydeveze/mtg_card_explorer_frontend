@@ -4,6 +4,8 @@ import CardItem from "./CardItem/CardItem";
 import Preloader from "../Preloader/Preloader";
 import EmptyState from "../EmptyState/EmptyState";
 
+import searchIcon from "../../images/search.svg";
+
 function Explorer() {
   const mockCards = Array.from({ length: 12 }, (_, i) => ({
     id: i,
@@ -21,18 +23,49 @@ function Explorer() {
 
   const [selectedCard, setSelectedCard] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [query, setQuery] = useState("");
+
+  function handleSubmit(e) {
+    e.preventDefault();
+
+    if (!query.trim()) return;
+
+    setLoading(true);
+
+    setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+  }
 
   return (
     <section className="explorer">
-      <div className="explorer__header">
+      <form
+        className="explorer__header"
+        onSubmit={(e) => {
+          e.preventDefault();
+          console.log("Buscar:", query);
+        }}
+      >
         <h1 className="explorer__title">Explorar Cartas</h1>
 
+        <label htmlFor="search" className="visually-hidden">
+          Buscar carta
+        </label>
+
         <input
+          id="search"
           type="text"
           placeholder="Buscar carta..."
           className="explorer__search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
         />
-      </div>
+
+        <button type="submit" className="explorer__submit">
+          <img src={searchIcon} alt="" />
+          <span className="explorer__submit-text">Buscar</span>
+        </button>
+      </form>
 
       <div className="explorer__grid">
         {loading ? (
