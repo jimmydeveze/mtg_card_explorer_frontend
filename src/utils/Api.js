@@ -11,9 +11,9 @@ class Api {
   }
 
   searchCards(query) {
-    return fetch(`${this._baseUrl}/cards/search?q=${encodeURIComponent(query)}`)
-      .then(this._checkResponse)
-      .then((data) => data.data); // Scryfall devuelve { data: [...] }
+    return fetch(`${this._baseUrl}/cards/search?q=${query}`).then(
+      this._checkResponse,
+    );
   }
 }
 
