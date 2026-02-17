@@ -23,7 +23,14 @@ function Explorer() {
     api
       .searchCards(query)
       .then((res) => {
-        setCards(res.data || []);
+        const validCards = (res.data || []).filter((card) => {
+          const hasImage =
+            card.image_uris?.normal || card.card_faces?.[0]?.image_uris?.normal;
+
+          return hasImage;
+        });
+
+        setCards(validCards);
       })
       .catch((err) => {
         console.error("Error buscando cartas:", err);

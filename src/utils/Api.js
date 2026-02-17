@@ -7,6 +7,11 @@ class Api {
     if (res.ok) {
       return res.json();
     }
+
+    if (res.status === 404) {
+      return Promise.resolve({ data: [] });
+    }
+
     return Promise.reject(`Error: ${res.status}`);
   }
 
