@@ -12,6 +12,7 @@ function Explorer() {
   const [loading, setLoading] = useState(false);
   const [cards, setCards] = useState([]);
   const [query, setQuery] = useState("");
+  const [error, setError] = useState(null);
 
   function handleSearch(e) {
     e.preventDefault();
@@ -19,21 +20,21 @@ function Explorer() {
     if (!query.trim()) return;
 
     setLoading(true);
+    setError(null);
 
     api
       .searchCards(query)
       .then((res) => {
-        const validCards = (res.data || []).filter((card) => {
-          const hasImage =
-            card.image_uris?.normal || card.card_faces?.[0]?.image_uris?.normal;
-
-          return hasImage;
-        });
+        const validCards = (res.data || []).filter(
+          (card) =>
+            card.image_uris?.normal || card.card_faces?.[0]?.image_uris?.normal,
+        );
 
         setCards(validCards);
       })
       .catch((err) => {
         console.error("Error buscando cartas:", err);
+        setError("No se pudo conectar con Scryfall.");
         setCards([]);
       })
       .finally(() => {
@@ -68,6 +69,8 @@ function Explorer() {
       <div className="explorer__grid">
         {loading ? (
           <Preloader />
+        ) : error ? (
+          <p className="explorer__message explorer__message--error">{error}</p>
         ) : cards.length === 0 ? (
           <EmptyState />
         ) : (

@@ -76,6 +76,17 @@
   clip: rect(0 0 0 0);
 }
 
+.explorer__message {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 0;
+  font-size: 1.1rem;
+}
+
+.explorer__message--error {
+  color: #ff6b6b;
+}
+
 @media (max-width: 600px) {
   .explorer__header {
     flex-direction: column;
