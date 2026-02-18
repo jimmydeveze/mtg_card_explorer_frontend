@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CardModal from "./CardModal/CardModal";
 import CardItem from "./CardItem/CardItem";
 import Preloader from "../Preloader/Preloader";
@@ -13,6 +13,8 @@ function Explorer() {
   const [cards, setCards] = useState([]);
   const [query, setQuery] = useState("");
   const [error, setError] = useState(null);
+  const [nextPage, setNextPage] = useState(null);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
 
   function handleSearch(e) {
     e.preventDefault();
@@ -31,9 +33,9 @@ function Explorer() {
         );
 
         setCards(validCards);
+        setNextPage(res.next_page || null);
       })
-      .catch((err) => {
-        console.error("Error buscando cartas:", err);
+      .catch(() => {
         setError("No se pudo conectar con Scryfall.");
         setCards([]);
       })
@@ -41,6 +43,45 @@ function Explorer() {
         setLoading(false);
       });
   }
+
+  function loadMoreCards() {
+    if (!nextPage || isFetchingMore) return;
+
+    setIsFetchingMore(true);
+
+    fetch(nextPage)
+      .then((res) => res.json())
+      .then((res) => {
+        const validCards = (res.data || []).filter(
+          (card) =>
+            card.image_uris?.normal || card.card_faces?.[0]?.image_uris?.normal,
+        );
+
+        setCards((prev) => [...prev, ...validCards]);
+        setNextPage(res.next_page || null);
+      })
+      .catch(() => {
+        console.error("Error cargando más cartas");
+      })
+      .finally(() => {
+        setIsFetchingMore(false);
+      });
+  }
+
+  useEffect(() => {
+    function handleScroll() {
+      const nearBottom =
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 500;
+
+      if (nearBottom) {
+        loadMoreCards();
+      }
+    }
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [nextPage, isFetchingMore]);
 
   return (
     <section className="explorer">
@@ -74,9 +115,9 @@ function Explorer() {
         ) : cards.length === 0 ? (
           <EmptyState />
         ) : (
-          cards.map((card) => (
+          cards.map((card, index) => (
             <CardItem
-              key={card.id}
+              key={`${card.id}-${index}`}
               card={{
                 id: card.id,
                 name: card.name,
@@ -95,6 +136,8 @@ function Explorer() {
           ))
         )}
       </div>
+
+      {isFetchingMore && <Preloader />}
 
       <CardModal card={selectedCard} onClose={() => setSelectedCard(null)} />
     </section>
