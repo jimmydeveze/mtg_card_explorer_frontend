@@ -12,6 +12,7 @@ function Explorer() {
   const [loading, setLoading] = useState(false);
   const [cards, setCards] = useState([]);
   const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [error, setError] = useState(null);
   const [nextPage, setNextPage] = useState(null);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
@@ -43,10 +44,16 @@ function Explorer() {
       });
   }
 
-  function handleSearch(e) {
-    e.preventDefault();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(query);
+    }, 400);
 
-    if (!query.trim()) return;
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  useEffect(() => {
+    if (!debouncedQuery.trim()) return;
 
     setLoading(true);
     setError(null);
@@ -54,7 +61,7 @@ function Explorer() {
     setNextPage(null);
 
     api
-      .searchCards(query)
+      .searchCards(debouncedQuery)
       .then((res) => {
         const validCards = (res.data || []).filter(
           (card) =>
@@ -70,7 +77,7 @@ function Explorer() {
       .finally(() => {
         setLoading(false);
       });
-  }
+  }, [debouncedQuery]);
 
   function loadMoreCards() {
     if (!nextPage || isFetchingMore) return;
@@ -98,12 +105,8 @@ function Explorer() {
 
         setNextPage(res.next_page || null);
       })
-      .catch(() => {
-        console.error("Error cargando más cartas");
-      })
-      .finally(() => {
-        setIsFetchingMore(false);
-      });
+      .catch(() => console.error("Error cargando más cartas"))
+      .finally(() => setIsFetchingMore(false));
   }
 
   useEffect(() => {
@@ -120,7 +123,7 @@ function Explorer() {
 
   return (
     <section className="explorer">
-      <form className="explorer__header" onSubmit={handleSearch}>
+      <form className="explorer__header" onSubmit={(e) => e.preventDefault()}>
         <h1 className="explorer__title">Explorar Cartas</h1>
 
         <label htmlFor="search" className="visually-hidden">
