@@ -16,6 +16,33 @@ function Explorer() {
   const [nextPage, setNextPage] = useState(null);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
+  useEffect(() => {
+    loadInitialCards();
+  }, []);
+
+  function loadInitialCards() {
+    setLoading(true);
+    setError(null);
+
+    api
+      .searchCards("*")
+      .then((res) => {
+        const validCards = (res.data || []).filter(
+          (card) =>
+            card.image_uris?.normal || card.card_faces?.[0]?.image_uris?.normal,
+        );
+
+        setCards(validCards);
+        setNextPage(res.next_page || null);
+      })
+      .catch(() => {
+        setError("No se pudieron cargar cartas.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }
+
   function handleSearch(e) {
     e.preventDefault();
 
@@ -23,6 +50,8 @@ function Explorer() {
 
     setLoading(true);
     setError(null);
+    setCards([]);
+    setNextPage(null);
 
     api
       .searchCards(query)
@@ -37,7 +66,6 @@ function Explorer() {
       })
       .catch(() => {
         setError("No se pudo conectar con Scryfall.");
-        setCards([]);
       })
       .finally(() => {
         setLoading(false);
@@ -57,7 +85,17 @@ function Explorer() {
             card.image_uris?.normal || card.card_faces?.[0]?.image_uris?.normal,
         );
 
-        setCards((prev) => [...prev, ...validCards]);
+        setCards((prev) => {
+          const merged = [...prev, ...validCards];
+
+          const unique = merged.filter(
+            (card, index, self) =>
+              index === self.findIndex((c) => c.id === card.id),
+          );
+
+          return unique;
+        });
+
         setNextPage(res.next_page || null);
       })
       .catch(() => {
@@ -73,15 +111,12 @@ function Explorer() {
       const nearBottom =
         window.innerHeight + window.scrollY >= document.body.offsetHeight - 500;
 
-      if (nearBottom) {
-        loadMoreCards();
-      }
+      if (nearBottom) loadMoreCards();
     }
 
     window.addEventListener("scroll", handleScroll);
-
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [nextPage, isFetchingMore]);
+  }, [nextPage]);
 
   return (
     <section className="explorer">
