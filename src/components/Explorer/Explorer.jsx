@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import CardModal from "./CardModal/CardModal";
 import CardItem from "./CardItem/CardItem";
+import FilterModal from "./FilterModal/FilterModal";
 import Preloader from "../Preloader/Preloader";
 import EmptyState from "../EmptyState/EmptyState";
 import { api } from "../../utils/api-instance";
@@ -9,24 +10,54 @@ import searchIcon from "../../images/search.svg";
 
 function Explorer() {
   const [selectedCard, setSelectedCard] = useState(null);
-  const [loading, setLoading] = useState(false);
+
   const [cards, setCards] = useState([]);
   const [query, setQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
+
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [filters, setFilters] = useState({
+    color: "",
+    type: "",
+    rarity: "",
+    minMana: "",
+    maxMana: "",
+    legal: "",
+    creaturesOnly: false,
+  });
+
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
   const [nextPage, setNextPage] = useState(null);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
-  useEffect(() => {
-    loadInitialCards();
-  }, []);
+  function buildQuery() {
+    let q = query.trim();
 
-  function loadInitialCards() {
+    if (filters.color) q += ` color:${filters.color}`;
+    if (filters.type) q += ` type:${filters.type}`;
+    if (filters.rarity) q += ` rarity:${filters.rarity}`;
+    if (filters.minMana) q += ` cmc>=${filters.minMana}`;
+    if (filters.maxMana) q += ` cmc<=${filters.maxMana}`;
+    if (filters.legal) q += ` legal:${filters.legal}`;
+    if (filters.creaturesOnly) q += ` type:creature`;
+
+    q = q.trim();
+    if (!q) q = "game:paper";
+
+    return q;
+  }
+
+  function performSearch() {
+    const finalQuery = buildQuery();
+    if (!finalQuery) return;
+
     setLoading(true);
     setError(null);
 
     api
-      .searchCards("*")
+      .searchCards(finalQuery)
+
       .then((res) => {
         const validCards = (res.data || []).filter(
           (card) =>
@@ -36,48 +67,29 @@ function Explorer() {
         setCards(validCards);
         setNextPage(res.next_page || null);
       })
+
       .catch(() => {
-        setError("No se pudieron cargar cartas.");
+        setError("No se pudo conectar con Scryfall.");
+        setCards([]);
       })
-      .finally(() => {
-        setLoading(false);
-      });
+
+      .finally(() => setLoading(false));
+  }
+
+  function handleSearch(e) {
+    e.preventDefault();
+    performSearch();
   }
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedQuery(query);
-    }, 400);
+    if (!query.trim()) return;
 
-    return () => clearTimeout(timer);
+    const delay = setTimeout(() => {
+      performSearch();
+    }, 600);
+
+    return () => clearTimeout(delay);
   }, [query]);
-
-  useEffect(() => {
-    if (!debouncedQuery.trim()) return;
-
-    setLoading(true);
-    setError(null);
-    setCards([]);
-    setNextPage(null);
-
-    api
-      .searchCards(debouncedQuery)
-      .then((res) => {
-        const validCards = (res.data || []).filter(
-          (card) =>
-            card.image_uris?.normal || card.card_faces?.[0]?.image_uris?.normal,
-        );
-
-        setCards(validCards);
-        setNextPage(res.next_page || null);
-      })
-      .catch(() => {
-        setError("No se pudo conectar con Scryfall.");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [debouncedQuery]);
 
   function loadMoreCards() {
     if (!nextPage || isFetchingMore) return;
@@ -92,20 +104,9 @@ function Explorer() {
             card.image_uris?.normal || card.card_faces?.[0]?.image_uris?.normal,
         );
 
-        setCards((prev) => {
-          const merged = [...prev, ...validCards];
-
-          const unique = merged.filter(
-            (card, index, self) =>
-              index === self.findIndex((c) => c.id === card.id),
-          );
-
-          return unique;
-        });
-
+        setCards((prev) => [...prev, ...validCards]);
         setNextPage(res.next_page || null);
       })
-      .catch(() => console.error("Error cargando más cartas"))
       .finally(() => setIsFetchingMore(false));
   }
 
@@ -119,19 +120,33 @@ function Explorer() {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [nextPage]);
+  }, [nextPage, isFetchingMore]);
+
+  useEffect(() => {
+    setLoading(true);
+
+    api
+      .searchCards("game:paper")
+
+      .then((res) => {
+        const validCards = (res.data || []).filter(
+          (card) =>
+            card.image_uris?.normal || card.card_faces?.[0]?.image_uris?.normal,
+        );
+
+        setCards(validCards);
+        setNextPage(res.next_page || null);
+      })
+
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <section className="explorer">
-      <form className="explorer__header" onSubmit={(e) => e.preventDefault()}>
+      <form className="explorer__header" onSubmit={handleSearch}>
         <h1 className="explorer__title">Explorar Cartas</h1>
 
-        <label htmlFor="search" className="visually-hidden">
-          Buscar carta
-        </label>
-
         <input
-          id="search"
           type="text"
           placeholder="Buscar carta..."
           className="explorer__search"
@@ -142,6 +157,14 @@ function Explorer() {
         <button type="submit" className="explorer__submit">
           <img src={searchIcon} alt="" />
           <span className="explorer__submit-text">Buscar</span>
+        </button>
+
+        <button
+          type="button"
+          className="explorer__submit"
+          onClick={() => setFiltersOpen(true)}
+        >
+          Filtros
         </button>
       </form>
 
@@ -178,6 +201,14 @@ function Explorer() {
       {isFetchingMore && <Preloader />}
 
       <CardModal card={selectedCard} onClose={() => setSelectedCard(null)} />
+
+      <FilterModal
+        isOpen={filtersOpen}
+        onClose={() => setFiltersOpen(false)}
+        filters={filters}
+        setFilters={setFilters}
+        onApply={performSearch}
+      />
     </section>
   );
 }
