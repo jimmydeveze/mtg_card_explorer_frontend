@@ -10,10 +10,8 @@ import searchIcon from "../../images/search.svg";
 
 function Explorer() {
   const [selectedCard, setSelectedCard] = useState(null);
-
   const [cards, setCards] = useState([]);
   const [query, setQuery] = useState("");
-
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState({
     color: "",
@@ -27,7 +25,6 @@ function Explorer() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
   const [nextPage, setNextPage] = useState(null);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
@@ -43,6 +40,7 @@ function Explorer() {
     if (filters.creaturesOnly) q += ` type:creature`;
 
     q = q.trim();
+
     if (!q) q = "game:paper";
 
     return q;
@@ -50,14 +48,12 @@ function Explorer() {
 
   function performSearch() {
     const finalQuery = buildQuery();
-    if (!finalQuery) return;
 
     setLoading(true);
     setError(null);
 
     api
       .searchCards(finalQuery)
-
       .then((res) => {
         const validCards = (res.data || []).filter(
           (card) =>
@@ -67,12 +63,10 @@ function Explorer() {
         setCards(validCards);
         setNextPage(res.next_page || null);
       })
-
       .catch(() => {
         setError("No se pudo conectar con Scryfall.");
         setCards([]);
       })
-
       .finally(() => setLoading(false));
   }
 
@@ -123,29 +117,22 @@ function Explorer() {
   }, [nextPage, isFetchingMore]);
 
   useEffect(() => {
-    setLoading(true);
-
-    api
-      .searchCards("game:paper")
-
-      .then((res) => {
-        const validCards = (res.data || []).filter(
-          (card) =>
-            card.image_uris?.normal || card.card_faces?.[0]?.image_uris?.normal,
-        );
-
-        setCards(validCards);
-        setNextPage(res.next_page || null);
-      })
-
-      .finally(() => setLoading(false));
+    performSearch();
   }, []);
+
+  function removeFilter(name) {
+    setFilters((prev) => ({
+      ...prev,
+      [name]: name === "creaturesOnly" ? false : "",
+    }));
+
+    setTimeout(() => performSearch(), 0);
+  }
 
   return (
     <section className="explorer">
       <form className="explorer__header" onSubmit={handleSearch}>
         <h1 className="explorer__title">Explorar Cartas</h1>
-
         <input
           type="text"
           placeholder="Buscar carta..."
@@ -167,6 +154,53 @@ function Explorer() {
           Filtros
         </button>
       </form>
+
+      <div className="explorer__chips">
+        {filters.color && (
+          <button
+            onClick={() => removeFilter("color")}
+            className={`chip chip--${filters.color}`}
+          >
+            {filters.color.toUpperCase()} ✕
+          </button>
+        )}
+
+        {filters.type && (
+          <button
+            onClick={() => removeFilter("type")}
+            className="chip chip--type"
+          >
+            {filters.type} ✕
+          </button>
+        )}
+
+        {filters.rarity && (
+          <button
+            onClick={() => removeFilter("rarity")}
+            className="chip chip--rarity"
+          >
+            {filters.rarity} ✕
+          </button>
+        )}
+
+        {filters.legal && (
+          <button
+            onClick={() => removeFilter("legal")}
+            className="chip chip--legal"
+          >
+            {filters.legal} ✕
+          </button>
+        )}
+
+        {filters.creaturesOnly && (
+          <button
+            onClick={() => removeFilter("creaturesOnly")}
+            className="chip chip--type"
+          >
+            criaturas ✕
+          </button>
+        )}
+      </div>
 
       <div className="explorer__grid">
         {loading ? (

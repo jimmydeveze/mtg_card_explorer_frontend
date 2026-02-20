@@ -87,6 +87,67 @@
   color: #ff6b6b;
 }
 
+.explorer__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 6px;
+}
+
+.chip {
+  --bg: #222;
+  --border: #444;
+
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: white;
+
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+
+.chip--w {
+  --bg: #8c7a3f;
+  --border: #cbbd82;
+}
+.chip--u {
+  --bg: #1f4f7a;
+  --border: #4da3ff;
+}
+.chip--b {
+  --bg: #2a2a2a;
+  --border: #777;
+}
+.chip--r {
+  --bg: #7a1f1f;
+  --border: #ff6b6b;
+}
+.chip--g {
+  --bg: #1f5f2a;
+  --border: #4ed36d;
+}
+
+.chip--type {
+  --bg: #2b2b44;
+  --border: #6b7cff;
+}
+.chip--rarity {
+  --bg: #443322;
+  --border: #d4a373;
+}
+.chip--legal {
+  --bg: #2c3e2f;
+  --border: #78c091;
+}
+
 @media (max-width: 600px) {
   .explorer__header {
     flex-direction: column;
