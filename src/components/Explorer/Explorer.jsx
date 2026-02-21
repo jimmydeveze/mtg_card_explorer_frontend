@@ -5,6 +5,7 @@ import FilterModal from "./FilterModal/FilterModal";
 import Preloader from "../Preloader/Preloader";
 import EmptyState from "../EmptyState/EmptyState";
 import { api } from "../../utils/api-instance";
+import { getCached, setCache } from "../../utils/cardsCache";
 
 import searchIcon from "../../images/search.svg";
 
@@ -49,6 +50,14 @@ function Explorer() {
   function performSearch() {
     const finalQuery = buildQuery();
 
+    const cached = getCached(finalQuery);
+
+    if (cached) {
+      setCards(cached.data);
+      setNextPage(cached.nextPage);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -62,6 +71,11 @@ function Explorer() {
 
         setCards(validCards);
         setNextPage(res.next_page || null);
+
+        setCache(finalQuery, {
+          data: validCards,
+          nextPage: res.next_page || null,
+        });
       })
       .catch(() => {
         setError("No se pudo conectar con Scryfall.");
@@ -88,6 +102,15 @@ function Explorer() {
   function loadMoreCards() {
     if (!nextPage || isFetchingMore) return;
 
+    const cacheKey = `page:${nextPage}`;
+    const cached = getCached(cacheKey);
+
+    if (cached) {
+      setCards((prev) => [...prev, ...cached.cards]);
+      setNextPage(cached.nextPage);
+      return;
+    }
+
     setIsFetchingMore(true);
 
     fetch(nextPage)
@@ -100,6 +123,11 @@ function Explorer() {
 
         setCards((prev) => [...prev, ...validCards]);
         setNextPage(res.next_page || null);
+
+        setCache(cacheKey, {
+          cards: validCards,
+          nextPage: res.next_page || null,
+        });
       })
       .finally(() => setIsFetchingMore(false));
   }
