@@ -49,9 +49,6 @@ function CardModal({ card, onClose }) {
     }
   }, [card]);
 
-  console.log("CARD:", card);
-  console.log("ORACLE:", card?.oracleId);
-
   useEffect(() => {
     if (!card?.oracleId) return;
 
@@ -61,7 +58,6 @@ function CardModal({ card, onClose }) {
     api
       .getSpanishPrint(card.oracleId)
       .then((data) => {
-        console.log("SPANISH RESULT:", data);
         if (data) setSpanish(data);
       })
       .catch(() => {});

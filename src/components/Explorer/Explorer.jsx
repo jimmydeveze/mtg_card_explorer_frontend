@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import CardModal from "./CardModal/CardModal";
 import CardItem from "./CardItem/CardItem";
 import FilterModal from "./FilterModal/FilterModal";
@@ -12,8 +12,10 @@ import searchIcon from "../../images/search.svg";
 function Explorer() {
   const [selectedCard, setSelectedCard] = useState(null);
   const [cards, setCards] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(50);
   const [query, setQuery] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
+
   const [filters, setFilters] = useState({
     color: "",
     type: "",
@@ -29,6 +31,8 @@ function Explorer() {
   const [nextPage, setNextPage] = useState(null);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
+  const fetchingRef = useRef(false);
+
   function buildQuery() {
     let q = query.trim();
 
@@ -41,7 +45,6 @@ function Explorer() {
     if (filters.creaturesOnly) q += ` type:creature`;
 
     q = q.trim();
-
     if (!q) q = "game:paper";
 
     return q;
@@ -49,12 +52,12 @@ function Explorer() {
 
   function performSearch() {
     const finalQuery = buildQuery();
-
     const cached = getCached(finalQuery);
 
     if (cached) {
       setCards(cached.data);
       setNextPage(cached.nextPage);
+      setVisibleCount(20);
       return;
     }
 
@@ -71,6 +74,7 @@ function Explorer() {
 
         setCards(validCards);
         setNextPage(res.next_page || null);
+        setVisibleCount(20);
 
         setCache(finalQuery, {
           data: validCards,
@@ -98,7 +102,15 @@ function Explorer() {
   }, [query]);
 
   function loadMoreCards() {
-    if (!nextPage || isFetchingMore) return;
+    if (visibleCount < cards.length) {
+      setVisibleCount((prev) => prev + 20);
+      return;
+    }
+
+    if (!nextPage || fetchingRef.current) return;
+
+    fetchingRef.current = true;
+    setIsFetchingMore(true);
 
     const cacheKey = `page:${nextPage}`;
     const cached = getCached(cacheKey);
@@ -106,10 +118,10 @@ function Explorer() {
     if (cached) {
       setCards((prev) => [...prev, ...cached.cards]);
       setNextPage(cached.nextPage);
+      fetchingRef.current = false;
+      setIsFetchingMore(false);
       return;
     }
-
-    setIsFetchingMore(true);
 
     fetch(nextPage)
       .then((res) => res.json())
@@ -127,20 +139,23 @@ function Explorer() {
           nextPage: res.next_page || null,
         });
       })
-      .finally(() => setIsFetchingMore(false));
+      .finally(() => {
+        fetchingRef.current = false;
+        setIsFetchingMore(false);
+      });
   }
 
   useEffect(() => {
     function handleScroll() {
       const nearBottom =
-        window.innerHeight + window.scrollY >= document.body.offsetHeight - 500;
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 200;
 
       if (nearBottom) loadMoreCards();
     }
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [nextPage, isFetchingMore]);
+  }, [nextPage, cards, visibleCount]);
 
   useEffect(() => {
     performSearch();
@@ -159,6 +174,7 @@ function Explorer() {
     <section className="explorer">
       <form className="explorer__header" onSubmit={handleSearch}>
         <h1 className="explorer__title">Explorar Cartas</h1>
+
         <input
           type="text"
           placeholder="Buscar carta..."
@@ -236,7 +252,7 @@ function Explorer() {
         ) : cards.length === 0 ? (
           <EmptyState />
         ) : (
-          cards.map((card, index) => (
+          cards.slice(0, visibleCount).map((card, index) => (
             <CardItem
               key={`${card.id}-${index}`}
               card={{
