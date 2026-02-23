@@ -90,8 +90,6 @@ function Explorer() {
   }
 
   useEffect(() => {
-    if (!query.trim()) return;
-
     const delay = setTimeout(() => {
       performSearch();
     }, 600);
@@ -243,6 +241,7 @@ function Explorer() {
               key={`${card.id}-${index}`}
               card={{
                 id: card.id,
+                oracleId: card.oracle_id,
                 name: card.name,
                 image:
                   card.image_uris?.normal ||

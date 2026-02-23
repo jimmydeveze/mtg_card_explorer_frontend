@@ -20,6 +20,15 @@ class Api {
       this._checkResponse,
     );
   }
+
+  getSpanishPrint(oracleId) {
+    return fetch(`${this._baseUrl}/cards/search?q=oracleid:${oracleId}+lang:es`)
+      .then((res) => {
+        if (!res.ok) return null;
+        return res.json();
+      })
+      .then((data) => data?.data?.[0] || null);
+  }
 }
 
 export { Api };

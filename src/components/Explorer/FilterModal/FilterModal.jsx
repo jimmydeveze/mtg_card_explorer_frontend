@@ -37,7 +37,6 @@ function FilterModal({ isOpen, onClose, filters, setFilters, onApply }) {
         </header>
 
         <div className="filterModal__grid">
-          {/* COLOR */}
           <label>
             Color
             <select name="color" value={filters.color} onChange={handleChange}>
@@ -50,7 +49,6 @@ function FilterModal({ isOpen, onClose, filters, setFilters, onApply }) {
             </select>
           </label>
 
-          {/* TIPO */}
           <label>
             Tipo
             <select name="type" value={filters.type} onChange={handleChange}>
@@ -65,7 +63,6 @@ function FilterModal({ isOpen, onClose, filters, setFilters, onApply }) {
             </select>
           </label>
 
-          {/* RAREZA */}
           <label>
             Rareza
             <select
@@ -81,7 +78,6 @@ function FilterModal({ isOpen, onClose, filters, setFilters, onApply }) {
             </select>
           </label>
 
-          {/* COSTO DE MANA */}
           <label>
             CMC mínimo
             <input
@@ -104,7 +100,6 @@ function FilterModal({ isOpen, onClose, filters, setFilters, onApply }) {
             />
           </label>
 
-          {/* FORMATO */}
           <label>
             Formato legal
             <select
@@ -121,7 +116,6 @@ function FilterModal({ isOpen, onClose, filters, setFilters, onApply }) {
             </select>
           </label>
 
-          {/* SOLO CRIATURAS */}
           <label className="checkbox">
             <input
               type="checkbox"

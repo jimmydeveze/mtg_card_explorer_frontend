@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { api } from "../../../utils/api-instance";
 
 function renderManaCost(manaCost) {
   if (!manaCost) return null;
@@ -22,6 +23,8 @@ function renderManaCost(manaCost) {
 
 function CardModal({ card, onClose }) {
   const dialogRef = useRef(null);
+  const [spanish, setSpanish] = useState(null);
+  const [lang, setLang] = useState("en");
 
   function handleClose() {
     const dialog = dialogRef.current;
@@ -33,6 +36,7 @@ function CardModal({ card, onClose }) {
       dialog.close();
       dialog.classList.remove("closing");
       onClose();
+      setSpanish(null);
     }, 200);
   }
 
@@ -44,6 +48,32 @@ function CardModal({ card, onClose }) {
       dialog.showModal();
     }
   }, [card]);
+
+  console.log("CARD:", card);
+  console.log("ORACLE:", card?.oracleId);
+
+  useEffect(() => {
+    if (!card?.oracleId) return;
+
+    setSpanish(null);
+    setLang("en");
+
+    api
+      .getSpanishPrint(card.oracleId)
+      .then((data) => {
+        console.log("SPANISH RESULT:", data);
+        if (data) setSpanish(data);
+      })
+      .catch(() => {});
+  }, [card?.oracleId]);
+
+  const activeText =
+    lang === "es" ? spanish?.printed_text || spanish?.oracle_text : card?.text;
+
+  const activeType =
+    lang === "es"
+      ? spanish?.printed_type_line || spanish?.type_line
+      : card?.type;
 
   return (
     <dialog
@@ -65,11 +95,30 @@ function CardModal({ card, onClose }) {
           </div>
 
           <div className="modal__info">
+            <div className="modal__lang-switch">
+              <button
+                className={lang === "en" ? "active" : ""}
+                onClick={() => setLang("en")}
+              >
+                EN
+              </button>
+
+              {spanish && (
+                <button
+                  className={lang === "es" ? "active" : ""}
+                  onClick={() => setLang("es")}
+                >
+                  ES
+                </button>
+              )}
+            </div>
+
             <h2 className="modal__title">{card.name}</h2>
 
             <div className="modal__mana">{renderManaCost(card.manaCost)}</div>
-            <p className="modal__type">{card.type}</p>
-            <p className="modal__text">{card.text}</p>
+
+            <p className="modal__type">{activeType}</p>
+            <p className="modal__text">{activeText}</p>
 
             <div className="modal__stats">
               <span>
