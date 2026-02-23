@@ -96,10 +96,10 @@ function Explorer() {
   useEffect(() => {
     const delay = setTimeout(() => {
       performSearch();
-    }, 600);
+    }, 400);
 
     return () => clearTimeout(delay);
-  }, [query]);
+  }, [query, filters]);
 
   function loadMoreCards() {
     if (visibleCount < cards.length) {
@@ -118,6 +118,7 @@ function Explorer() {
     if (cached) {
       setCards((prev) => [...prev, ...cached.cards]);
       setNextPage(cached.nextPage);
+      setVisibleCount((prev) => prev + 20);
       fetchingRef.current = false;
       setIsFetchingMore(false);
       return;
@@ -138,6 +139,8 @@ function Explorer() {
           cards: validCards,
           nextPage: res.next_page || null,
         });
+
+        setVisibleCount((prev) => prev + 20);
       })
       .finally(() => {
         fetchingRef.current = false;
@@ -157,17 +160,11 @@ function Explorer() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [nextPage, cards, visibleCount]);
 
-  useEffect(() => {
-    performSearch();
-  }, []);
-
   function removeFilter(name) {
     setFilters((prev) => ({
       ...prev,
       [name]: name === "creaturesOnly" ? false : "",
     }));
-
-    setTimeout(() => performSearch(), 0);
   }
 
   return (
@@ -284,7 +281,7 @@ function Explorer() {
         onClose={() => setFiltersOpen(false)}
         filters={filters}
         setFilters={setFilters}
-        onApply={performSearch}
+        onApply={() => {}}
       />
     </section>
   );
