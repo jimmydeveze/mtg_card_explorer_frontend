@@ -42,8 +42,6 @@
   background-color: #f6121d;
 }
 
-/* Carta destacada */
-
 .home__card-preview {
   margin-top: 20px;
   flex: 1;
@@ -81,6 +79,19 @@
 
 .home__steps li {
   margin-bottom: 10px;
+}
+
+.home__card-image {
+  width: 320px; /* mismo ancho que placeholder */
+  height: 450px; /* mismo alto */
+  object-fit: cover; /* mantiene proporción */
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  transition: transform 0.3s ease;
+}
+
+.home__card-image:hover {
+  transform: scale(1.05);
 }
 
 @media (max-width: 900px) {

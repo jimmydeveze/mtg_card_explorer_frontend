@@ -29,6 +29,10 @@ class Api {
       })
       .then((data) => data?.data?.[0] || null);
   }
+
+  getRandomCard() {
+    return fetch(`${this._baseUrl}/cards/random`).then(this._checkResponse);
+  }
 }
 
 export { Api };

@@ -1,6 +1,23 @@
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { api } from "../../utils/api-instance";
 
 function Home() {
+  const [randomCard, setRandomCard] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api
+      .getRandomCard()
+      .then((card) => {
+        setRandomCard(card);
+      })
+      .catch(() => {
+        setRandomCard(null);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <section className="home">
       <div className="home__hero">
@@ -27,9 +44,25 @@ function Home() {
           </div>
         </div>
 
-        {/* Carta destacada (por ahora placeholder) */}
+        {/* CARTA RANDOM */}
         <div className="home__card-preview">
-          <div className="home__card-placeholder">Carta destacada</div>
+          {loading ? (
+            <div className="home__card-placeholder">Cargando carta...</div>
+          ) : randomCard ? (
+            <img
+              src={
+                randomCard.image_uris?.normal ||
+                randomCard.card_faces?.[0]?.image_uris?.normal
+              }
+              alt={randomCard.name}
+              className="home__card-image"
+              loading="lazy"
+            />
+          ) : (
+            <div className="home__card-placeholder">
+              No se pudo cargar la carta
+            </div>
+          )}
         </div>
       </div>
     </section>
