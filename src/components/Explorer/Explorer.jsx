@@ -7,6 +7,10 @@ import EmptyState from "../EmptyState/EmptyState";
 import { api } from "../../utils/api-instance";
 import { getCached, setCache } from "../../utils/cardsCache";
 
+import { buildQuery } from "../../utils/buildQuery";
+import { filterValidCards } from "../../utils/filterValidCards";
+import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
+
 import searchIcon from "../../images/search.svg";
 
 function Explorer() {
@@ -33,31 +37,14 @@ function Explorer() {
 
   const fetchingRef = useRef(false);
 
-  function buildQuery() {
-    let q = query.trim();
-
-    if (filters.color) q += ` color:${filters.color}`;
-    if (filters.type) q += ` type:${filters.type}`;
-    if (filters.rarity) q += ` rarity:${filters.rarity}`;
-    if (filters.minMana) q += ` cmc>=${filters.minMana}`;
-    if (filters.maxMana) q += ` cmc<=${filters.maxMana}`;
-    if (filters.legal) q += ` legal:${filters.legal}`;
-    if (filters.creaturesOnly) q += ` type:creature`;
-
-    q = q.trim();
-    if (!q) q = "game:paper";
-
-    return q;
-  }
-
   function performSearch() {
-    const finalQuery = buildQuery();
+    const finalQuery = buildQuery(query, filters);
     const cached = getCached(finalQuery);
 
     if (cached) {
       setCards(cached.data);
       setNextPage(cached.nextPage);
-      setVisibleCount(20);
+      setVisibleCount(50);
       return;
     }
 
@@ -67,14 +54,11 @@ function Explorer() {
     api
       .searchCards(finalQuery)
       .then((res) => {
-        const validCards = (res.data || []).filter(
-          (card) =>
-            card.image_uris?.normal || card.card_faces?.[0]?.image_uris?.normal,
-        );
+        const validCards = filterValidCards(res.data);
 
         setCards(validCards);
         setNextPage(res.next_page || null);
-        setVisibleCount(20);
+        setVisibleCount(50);
 
         setCache(finalQuery, {
           data: validCards,
@@ -88,22 +72,9 @@ function Explorer() {
       .finally(() => setLoading(false));
   }
 
-  function handleSearch(e) {
-    e.preventDefault();
-    performSearch();
-  }
-
-  useEffect(() => {
-    const delay = setTimeout(() => {
-      performSearch();
-    }, 400);
-
-    return () => clearTimeout(delay);
-  }, [query, filters]);
-
   function loadMoreCards() {
     if (visibleCount < cards.length) {
-      setVisibleCount((prev) => prev + 20);
+      setVisibleCount((prev) => prev + 50);
       return;
     }
 
@@ -118,7 +89,7 @@ function Explorer() {
     if (cached) {
       setCards((prev) => [...prev, ...cached.cards]);
       setNextPage(cached.nextPage);
-      setVisibleCount((prev) => prev + 20);
+      setVisibleCount((prev) => prev + 50);
       fetchingRef.current = false;
       setIsFetchingMore(false);
       return;
@@ -127,10 +98,7 @@ function Explorer() {
     fetch(nextPage)
       .then((res) => res.json())
       .then((res) => {
-        const validCards = (res.data || []).filter(
-          (card) =>
-            card.image_uris?.normal || card.card_faces?.[0]?.image_uris?.normal,
-        );
+        const validCards = filterValidCards(res.data);
 
         setCards((prev) => [...prev, ...validCards]);
         setNextPage(res.next_page || null);
@@ -140,7 +108,7 @@ function Explorer() {
           nextPage: res.next_page || null,
         });
 
-        setVisibleCount((prev) => prev + 20);
+        setVisibleCount((prev) => prev + 50);
       })
       .finally(() => {
         fetchingRef.current = false;
@@ -149,16 +117,11 @@ function Explorer() {
   }
 
   useEffect(() => {
-    function handleScroll() {
-      const nearBottom =
-        window.innerHeight + window.scrollY >= document.body.offsetHeight - 200;
+    const delay = setTimeout(performSearch, 400);
+    return () => clearTimeout(delay);
+  }, [query, filters]);
 
-      if (nearBottom) loadMoreCards();
-    }
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [nextPage, cards, visibleCount]);
+  useInfiniteScroll(loadMoreCards, [nextPage, cards, visibleCount]);
 
   function removeFilter(name) {
     setFilters((prev) => ({
@@ -169,7 +132,14 @@ function Explorer() {
 
   return (
     <section className="explorer">
-      <form className="explorer__header" onSubmit={handleSearch}>
+      {/* HEADER */}
+      <form
+        className="explorer__header"
+        onSubmit={(e) => {
+          e.preventDefault();
+          performSearch();
+        }}
+      >
         <h1 className="explorer__title">Explorar Cartas</h1>
 
         <input
@@ -194,53 +164,7 @@ function Explorer() {
         </button>
       </form>
 
-      <div className="explorer__chips">
-        {filters.color && (
-          <button
-            onClick={() => removeFilter("color")}
-            className={`chip chip--${filters.color}`}
-          >
-            {filters.color.toUpperCase()} ✕
-          </button>
-        )}
-
-        {filters.type && (
-          <button
-            onClick={() => removeFilter("type")}
-            className="chip chip--type"
-          >
-            {filters.type} ✕
-          </button>
-        )}
-
-        {filters.rarity && (
-          <button
-            onClick={() => removeFilter("rarity")}
-            className="chip chip--rarity"
-          >
-            {filters.rarity} ✕
-          </button>
-        )}
-
-        {filters.legal && (
-          <button
-            onClick={() => removeFilter("legal")}
-            className="chip chip--legal"
-          >
-            {filters.legal} ✕
-          </button>
-        )}
-
-        {filters.creaturesOnly && (
-          <button
-            onClick={() => removeFilter("creaturesOnly")}
-            className="chip chip--type"
-          >
-            criaturas ✕
-          </button>
-        )}
-      </div>
-
+      {/* GRID */}
       <div className="explorer__grid">
         {loading ? (
           <Preloader />
