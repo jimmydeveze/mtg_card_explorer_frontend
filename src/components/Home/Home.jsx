@@ -44,7 +44,6 @@ function Home() {
           </div>
         </div>
 
-        {/* CARTA RANDOM */}
         <div className="home__card-preview">
           {loading ? (
             <div className="home__card-placeholder">Cargando carta...</div>

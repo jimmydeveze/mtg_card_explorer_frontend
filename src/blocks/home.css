@@ -82,9 +82,9 @@
 }
 
 .home__card-image {
-  width: 320px; /* mismo ancho que placeholder */
-  height: 450px; /* mismo alto */
-  object-fit: cover; /* mantiene proporción */
+  width: 320px;
+  height: 450px;
+  object-fit: cover;
   border-radius: 16px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
   transition: transform 0.3s ease;
