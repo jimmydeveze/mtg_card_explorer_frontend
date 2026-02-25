@@ -4,6 +4,7 @@ import CardItem from "./CardItem/CardItem";
 import FilterModal from "./FilterModal/FilterModal";
 import Preloader from "../Preloader/Preloader";
 import EmptyState from "../EmptyState/EmptyState";
+import ExplorerChips from "./ExplorerChips/ExplorerChips";
 import { api } from "../../utils/api-instance";
 import { getCached, setCache } from "../../utils/cardsCache";
 
@@ -132,7 +133,6 @@ function Explorer() {
 
   return (
     <section className="explorer">
-      {/* HEADER */}
       <form
         className="explorer__header"
         onSubmit={(e) => {
@@ -164,7 +164,8 @@ function Explorer() {
         </button>
       </form>
 
-      {/* GRID */}
+      <ExplorerChips filters={filters} removeFilter={removeFilter} />
+
       <div className="explorer__grid">
         {loading ? (
           <Preloader />
