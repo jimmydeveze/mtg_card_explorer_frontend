@@ -1,18 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import CardModal from "./CardModal/CardModal";
-import CardItem from "./CardItem/CardItem";
 import FilterModal from "./FilterModal/FilterModal";
+import ExplorerHeader from "./ExplorerHeader/ExplorerHeader";
+import ExplorerGrid from "./ExplorerGrid/ExplorerGrid";
 import Preloader from "../Preloader/Preloader";
-import EmptyState from "../EmptyState/EmptyState";
 import ExplorerChips from "./ExplorerChips/ExplorerChips";
 import { api } from "../../utils/api-instance";
 import { getCached, setCache } from "../../utils/cardsCache";
-
 import { buildQuery } from "../../utils/buildQuery";
 import { filterValidCards } from "../../utils/filterValidCards";
 import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
-
-import searchIcon from "../../images/search.svg";
 
 function Explorer() {
   const [selectedCard, setSelectedCard] = useState(null);
@@ -133,69 +130,25 @@ function Explorer() {
 
   return (
     <section className="explorer">
-      <form
-        className="explorer__header"
+      <ExplorerHeader
+        query={query}
+        setQuery={setQuery}
         onSubmit={(e) => {
           e.preventDefault();
           performSearch();
         }}
-      >
-        <h1 className="explorer__title">Explorar Cartas</h1>
-
-        <input
-          type="text"
-          placeholder="Buscar carta..."
-          className="explorer__search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-
-        <button type="submit" className="explorer__submit">
-          <img src={searchIcon} alt="" />
-          <span className="explorer__submit-text">Buscar</span>
-        </button>
-
-        <button
-          type="button"
-          className="explorer__submit"
-          onClick={() => setFiltersOpen(true)}
-        >
-          Filtros
-        </button>
-      </form>
+        openFilters={() => setFiltersOpen(true)}
+      />
 
       <ExplorerChips filters={filters} removeFilter={removeFilter} />
 
-      <div className="explorer__grid">
-        {loading ? (
-          <Preloader />
-        ) : error ? (
-          <p className="explorer__message explorer__message--error">{error}</p>
-        ) : cards.length === 0 ? (
-          <EmptyState />
-        ) : (
-          cards.slice(0, visibleCount).map((card, index) => (
-            <CardItem
-              key={`${card.id}-${index}`}
-              card={{
-                id: card.id,
-                oracleId: card.oracle_id,
-                name: card.name,
-                image:
-                  card.image_uris?.normal ||
-                  card.card_faces?.[0]?.image_uris?.normal,
-                type: card.type_line,
-                manaCost: card.mana_cost,
-                power: card.power,
-                toughness: card.toughness,
-                text: card.oracle_text,
-                rarity: card.rarity,
-              }}
-              onClick={setSelectedCard}
-            />
-          ))
-        )}
-      </div>
+      <ExplorerGrid
+        loading={loading}
+        error={error}
+        cards={cards}
+        visibleCount={visibleCount}
+        onCardClick={setSelectedCard}
+      />
 
       {isFetchingMore && <Preloader />}
 
