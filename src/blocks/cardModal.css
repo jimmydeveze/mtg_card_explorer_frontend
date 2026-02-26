@@ -140,19 +140,18 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: white;
   transition: 0.2s ease;
+}
+
+.modal__close:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.05);
 }
 
 .modal__close img {
   width: 18px;
   height: 18px;
   filter: invert(1);
-}
-
-.modal__close:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: scale(1.05);
 }
 
 .modal.closing {

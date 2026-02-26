@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 
+import closeIcon from "../../../images/close.svg";
+
 function FilterModal({ isOpen, onClose, filters, setFilters, onApply }) {
   const dialogRef = useRef(null);
 
@@ -31,8 +33,8 @@ function FilterModal({ isOpen, onClose, filters, setFilters, onApply }) {
       <form className="filterModal__content" onSubmit={handleSubmit}>
         <header className="filterModal__header">
           <h2>Filtros avanzados</h2>
-          <button type="button" onClick={onClose}>
-            ✕
+          <button className="modal__close" onClick={onClose}>
+            <img src={closeIcon} alt="Close" />
           </button>
         </header>
 
