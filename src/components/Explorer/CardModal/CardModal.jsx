@@ -1,23 +1,27 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "../../../utils/api-instance";
 
-function renderManaCost(manaCost) {
-  if (!manaCost) return null;
+import closeIcon from "../../../images/close.svg";
 
-  const symbols = manaCost.match(/{(.*?)}/g);
-  if (!symbols) return manaCost;
+function renderTextWithSymbols(text) {
+  if (!text) return null;
 
-  return symbols.map((symbol, index) => {
-    const clean = symbol.replace(/[{}]/g, "");
+  const parts = text.split(/({.*?})/g);
 
-    return (
-      <img
-        key={index}
-        src={`https://svgs.scryfall.io/card-symbols/${clean}.svg`}
-        alt={clean}
-        className="mana-icon"
-      />
-    );
+  return parts.map((part, index) => {
+    if (part.startsWith("{") && part.endsWith("}")) {
+      const clean = part.replace(/[{}]/g, "").trim();
+      return (
+        <img
+          key={index}
+          src={`https://svgs.scryfall.io/card-symbols/${clean}.svg`}
+          alt={clean}
+          className="mana-icon-inline"
+        />
+      );
+    }
+
+    return <span key={index}>{part}</span>;
   });
 }
 
@@ -83,7 +87,7 @@ function CardModal({ card, onClose }) {
       {card && (
         <div className="modal__content">
           <button className="modal__close" onClick={() => handleClose()}>
-            ✕
+            <img src={closeIcon} alt="Close" />
           </button>
 
           <div className="modal__image-container">
@@ -109,18 +113,23 @@ function CardModal({ card, onClose }) {
               )}
             </div>
 
-            <h2 className="modal__title">{card.name}</h2>
-
-            <div className="modal__mana">{renderManaCost(card.manaCost)}</div>
+            <div className="modal__header">
+              <h2 className="modal__title">{card.name}</h2>
+              <div className="modal__mana">
+                {renderTextWithSymbols(card.manaCost)}
+              </div>
+            </div>
 
             <p className="modal__type">{activeType}</p>
-            <p className="modal__text">{activeText}</p>
+            <p className="modal__text">{renderTextWithSymbols(activeText)}</p>
 
             <div className="modal__stats">
               <span>
                 {card.power}/{card.toughness}
               </span>
-              <span>{card.rarity}</span>
+              <span className={`rarity rarity--${card.rarity}`}>
+                {card.rarity}
+              </span>
             </div>
           </div>
         </div>
