@@ -13,14 +13,23 @@ function ExplorerHeader({ query, setQuery, onSubmit, openFilters }) {
         onChange={(e) => setQuery(e.target.value)}
       />
 
-      <button type="submit" className="explorer__submit">
-        <img src={searchIcon} alt="" />
-        <span className="explorer__submit-text">Buscar</span>
-      </button>
+      <div className="explorer__actions">
+        <button
+          type="submit"
+          className="explorer__submit explorer__submit--search"
+        >
+          <img src={searchIcon} alt="" className="explorer__icon" />
+          <span className="explorer__submit-text">Buscar</span>
+        </button>
 
-      <button type="button" className="explorer__submit" onClick={openFilters}>
-        Filtros
-      </button>
+        <button
+          type="button"
+          className="explorer__submit explorer__submit--filter"
+          onClick={openFilters}
+        >
+          Filtros
+        </button>
+      </div>
     </form>
   );
 }

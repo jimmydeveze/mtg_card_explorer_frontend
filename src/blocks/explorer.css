@@ -37,6 +37,11 @@
   gap: 24px;
 }
 
+.explorer__actions {
+  display: flex;
+  gap: 12px;
+}
+
 .explorer__submit {
   display: flex;
   align-items: center;
@@ -52,6 +57,10 @@
   transition:
     background-color 0.25s ease,
     transform 0.15s ease;
+}
+
+.explorer__icon {
+  filter: invert(1);
 }
 
 .explorer__submit:hover {
@@ -148,17 +157,18 @@
   --border: #78c091;
 }
 
-@media (max-width: 600px) {
-  .explorer__header {
-    flex-direction: column;
-    align-items: stretch;
+@media (max-width: 596px) {
+  .explorer__title {
+    text-align: center;
   }
 
-  .explorer__submit-text {
-    display: none;
+  .explorer__actions {
+    flex-direction: column;
+    width: 100%;
   }
 
   .explorer__submit {
     width: 100%;
+    justify-content: center;
   }
 }
