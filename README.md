@@ -31,3 +31,5 @@ Uso de la API SScryfall: El proyecto utiliza la API pública de Scryfall, una de
 
 - Documentación oficial:
   https://scryfall.com/docs/api
+
+Pagina:
