@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import Header from "../Header/Header.jsx";
 import Home from "../Home/Home.jsx";
 import Explorer from "../Explorer/Explorer.jsx";
@@ -6,7 +6,7 @@ import Footer from "../Footer/Footer.jsx";
 
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <div className="page">
         <Header />
 
@@ -19,7 +19,7 @@ function App() {
 
         <Footer />
       </div>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
